@@ -1,0 +1,2220 @@
+DATA	SEGMENT	
+      ;倒计时数组		
+      LED0 DB 50H,49H,48H,47H,46H,45H,44H,43H,42H,41H
+      LED1 DB 40H,39H,38H,37H,36H,35H,34H,33H,32H,31H,30H,29H,28H,27H,26H,25H,24H,23H,22H,21H,20H,19H,18H,17H,16H,15H,14H,13H,12H,11H,10H,9H,8H,7H,6H,5H,4H,3H,2H,1H
+      LED5 DB 5H,4H,3H,2H,1H
+      LED30 DB 30H,29H,28H,27H,26H,25H,24H,23H,22H,21H,20H,19H,18H,17H,16H,15H,14H,13H,12H,11H,10H,9H,8H,7H,6H,5H,4H,3H,2H,1H
+      LEDA DB 99H,98H,97H,96H,95H,94H,93H,92H,91H,90H
+      LEDB DB 89H,88H,87H,86H,85H,84H,83H,82H,81H,80H,79H,78H,77H,76H,75H,74H,73H,72H,71H,70H,69H,68H,67H,66H,65H,64H,63H,62H,61H,60H,59H,58H,57H,56H,55H,54H,53H,52H,51H,50H
+      LEDC DB 49H,48H,47H,46H,45H,44H,43H,42H,41H,40H
+      LEDD DB 39H,38H,37H,36H,35H,34H,33H,32H,31H,30H,29H,28H,27H,26H,25H,24H,23H,22H,21H,20H,19H,18H,17H,16H,15H,14H,13H,12H,11H,10H
+      LEDE DB 9H,8H,7H,6H,5H,4H,3H,2H,1H,0H
+     ;东西方向8255
+     ;A控制西 B控制东 C控制两个数码管
+      PA0 EQU 60H
+      PB0 EQU 62H
+      PC0 EQU 64H
+      LED_8255_1 EQU 66H
+      ;南北方向8255
+      ;A控制北 B控制南 C控制两个数码管
+      PA1 EQU 78H
+      PB1 EQU 7AH
+      PC1 EQU 7CH
+      LED_8255_2 EQU 7EH
+      ;交警控制8255
+      PA EQU 70H
+      PB EQU 72H
+      PC EQU 74H
+      LED_8255 EQU 76H
+
+      ;——8259地址
+      ICW1 EQU 68H
+      ICW2 EQU 6AH
+      ICW3 EQU 6AH
+      ICW4 EQU 6AH 
+      OCW1 EQU 6AH
+      OCW2 EQU 68H
+      OCW3 EQU 68H
+      ;LED计数器
+      N DB 00H
+      LCD DW 0000H
+      ;
+     ;;;;;;; ;点阵8255地址
+   
+    DZA_1 EQU 0200H     
+    DZB_1 EQU 0202H     
+    DZC_1 EQU 0204H      
+    DZ_LED1 EQU 0206H
+    
+    DZA_2 EQU 0300H      
+    DZB_2 EQU 0302H    
+    DZC_2 EQU 0304H      
+    DZ_LED2 EQU 0306H    
+    
+    DZA_3 EQU 0400H      
+    DZB_3 EQU 0402H     
+    DZC_3 EQU 0404H      
+    DZ_LED3 EQU 0406H    
+    
+    DZA_4 EQU 0500H      
+    DZB_4 EQU 0502H      
+    DZC_4 EQU 0504H      
+    DZ_LED4 EQU 0506H   
+ 
+WO DB 00H,20H,08H,24H,48H,24H,84H,24H,7FH,0FEH,02H,23H,41H,22H,40H,20H
+DB  20H,20H,13H,0FFH,0CH,20H,14H,22H,22H,2CH,41H,0A0H,0F8H,20H,00H,00H;我
+
+DE DB  00H,00H,7FH,0F8H,21H,0CH,21H,0BH,21H,08H,21H,08H,7FH,0F8H,00H,40H
+DB  00H,30H,00H,8FH,43H,08H,80H,08H,40H,08H,3FH,0F8H,00H,00H,00H,00H;的
+    
+X_1 DB  10H,00H,0CH,00H,03H,80H,00H,00H,00H,00H,3FH,0E0H,40H,02H,40H,04H
+DB  40H,18H,40H,00H,40H,00H,78H,00H,00H,40H,01H,80H,0EH,00H,00H,00H;心
+
+Y_1 DB  80H,00H,60H,00H,1FH,0FEH,80H,02H,64H,02H,02H,0FAH,61H,0AAH,84H,0AAH
+DB  88H,0AEH,0B7H,0AAH,80H,0AAH,0C1H,0AAH,02H,0FAH,14H,02H,60H,02H,00H,00H;愿
+
+shi_1  DB  00H,00H,00H,20H,40H,20H,40H,20H,40H,20H,47H,0FFH,44H,20H,44H,20H
+DB  44H,20H,47H,0FFH,40H,20H,40H,20H,7FH,0FEH,00H,20H,00H,20H,00H,20H;世
+jie DB  08H,00H,08H,00H,04H,00H,84H,0FEH,62H,92H,1EH,92H,01H,92H,00H,0FEH
+DB  01H,92H,0FEH,92H,02H,92H,04H,0FEH,04H,00H,08H,00H,08H,00H,00H,00H;界
+    
+kong DB 00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H
+  DB 00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H;空白
+he DB  00H,00H,00H,00H,3FH,0F8H,10H,08H,10H,08H,10H,08H,3FH,0F8H,00H,00H
+DB  00H,20H,06H,22H,01H,23H,0FFH,0FEH,01H,0A4H,06H,24H,08H,24H,10H,20H;和
+ping DB  00H,00H,01H,00H,01H,02H,01H,02H,01H,32H,01H,42H,01H,02H,01H,02H
+DB  0FFH,0FEH,01H,02H,01H,02H,01H,62H,01H,12H,01H,02H,01H,02H,01H,00H;平
+
+
+    ;;;;;;
+      N1 DB 00H
+      CNT DW 0000H
+      DNT DW 0000H
+      ENT DW 0000H
+      FNT DW 0000H
+       ;;;;;;;;;;;
+       ;;;;;;;;;;
+      ;液晶屏代码
+PORTA EQU 0100H ;8255的PA口地址
+PORTB EQU 0102H ;A1、A2用于端口选择
+PORTC EQU 0104H ;PC口，上面是PB口
+PCONT EQU 0106H ;8255的控制口地址
+RESET EQU 11100010B ;LCD复位命令码
+DISP_ON EQU 10101111B ;LCD显示开命令码
+DISP_NOR EQU 10100110B ;LCD正常显示命令码
+DISP_ALL EQU 10100100B ;LCD所有点全部显示命令码
+LINE0 EQU 01000000B ;行号，0开始，到63
+PAGE0 EQU 10110000B ;页号，0开始，到7
+COLHIGH EQU 00010000B ;列号高四位
+COLLOW EQU 00000000B ;列号低四位，共16列
+ADCA EQU 10100000B ;向左显示命令码
+XI DB  02H,02H,0E2H,22H,22H,0FEH,22H,22H,22H,0FEH,22H,22H,0E2H,02H,02H,00H
+DB  00H,00H,0FFH,48H,44H,43H,40H,40H,40H,43H,44H,44H,0FFH,00H,00H,00H;西
+BEI DB  00H,20H,20H,20H,20H,0FFH,00H,00H,00H,0FFH,40H,20H,10H,08H,00H,00H
+DB  20H,60H,20H,10H,10H,0FFH,00H,00H,00H,3FH,40H,40H,40H,40H,78H,00H;北
+SHI DB  00H,0FCH,00H,00H,0FFH,00H,02H,0E2H,22H,22H,0FEH,22H,22H,0E2H,02H,00H
+DB  00H,87H,40H,30H,0FH,00H,00H,1FH,00H,00H,0FFH,08H,10H,0FH,00H,00H;师
+DA DB  20H,20H,20H,20H,20H,20H,20H,0FFH,20H,20H,20H,20H,20H,20H,20H,00H
+DB  80H,80H,40H,20H,10H,0CH,03H,00H,03H,0CH,10H,20H,40H,80H,80H,00H;大
+JI DB  40H,40H,42H,0CCH,00H,40H,40H,40H,40H,0FFH,40H,40H,40H,40H,40H,00H
+DB  00H,00H,00H,7FH,20H,10H,00H,00H,00H,0FFH,00H,00H,00H,00H,00H,00H;计
+GONG DB  00H,04H,04H,04H,04H,04H,04H,0FCH,04H,04H,04H,04H,04H,04H,00H,00H
+DB  20H,20H,20H,20H,20H,20H,20H,3FH,20H,20H,20H,20H,20H,20H,20H,00H;工
+XUE DB  40H,30H,11H,96H,90H,90H,91H,96H,90H,90H,98H,14H,13H,50H,30H,00H
+DB  04H,04H,04H,04H,04H,44H,84H,7EH,06H,05H,04H,04H,04H,04H,04H,00H;学
+YUAN DB  00H,0FEH,22H,5AH,86H,10H,0CH,24H,24H,25H,26H,24H,24H,14H,0CH,00H
+DB  00H,0FFH,04H,08H,07H,80H,41H,31H,0FH,01H,01H,3FH,41H,41H,71H,00H;院
+YU DB  40H,20H,0F0H,28H,24H,27H,24H,0E4H,24H,34H,2CH,20H,0E0H,00H,00H,00H
+DB  40H,40H,4FH,49H,49H,49H,49H,4FH,49H,49H,49H,49H,4FH,40H,40H,00H;鱼
+ZHOU DB  10H,60H,02H,8CH,00H,0C0H,00H,0FFH,40H,80H,0FEH,40H,80H,0FFH,00H,00H
+DB  04H,04H,7EH,01H,01H,80H,60H,1FH,00H,00H,3FH,00H,00H,0FFH,00H,00H;洲
+WEI DB  10H,88H,0C4H,33H,80H,9EH,90H,9FH,90H,9EH,20H,0D8H,17H,0F0H,10H,00H
+DB  01H,00H,0FFH,80H,40H,3EH,02H,02H,3EH,10H,88H,67H,18H,67H,80H,00H;微
+GI DB  10H,10H,0D0H,0FFH,90H,10H,00H,0FEH,02H,02H,02H,0FEH,00H,00H,00H,00H
+DB  04H,03H,00H,0FFH,00H,83H,60H,1FH,00H,00H,00H,3FH,40H,40H,78H,00H;机
+OP DB  00H,00H,0FEH,02H,02H,0F2H,92H,9AH,96H,92H,92H,0F2H,02H,02H,02H,00H
+DB  80H,60H,1FH,40H,20H,17H,44H,84H,7CH,04H,04H,17H,20H,40H,00H,00H;原
+LI DB  04H,84H,84H,0FCH,84H,84H,00H,0FEH,92H,92H,0FEH,92H,92H,0FEH,00H,00H
+DB  20H,60H,20H,1FH,10H,10H,40H,44H,44H,44H,7FH,44H,44H,44H,40H,00H;理
+QI DB  00H,04H,0FFH,24H,24H,24H,0FFH,04H,00H,0FEH,22H,22H,22H,0FEH,00H,00H
+DB  88H,48H,2FH,09H,09H,19H,0AFH,48H,30H,0FH,02H,42H,82H,7FH,00H,00H;期
+MO DB  08H,88H,88H,88H,88H,88H,88H,0FFH,88H,88H,88H,88H,88H,88H,08H,00H
+DB  20H,20H,10H,08H,04H,02H,01H,0FFH,01H,02H,04H,08H,10H,20H,20H,00H;末
+SHE DB  40H,40H,42H,0CCH,00H,40H,0A0H,9EH,82H,82H,82H,9EH,0A0H,20H,20H,00H
+DB  00H,00H,00H,3FH,90H,88H,40H,43H,2CH,10H,28H,46H,41H,80H,80H,00H;设
+C0 DB 00H,0E0H,10H,08H,08H,10H,0E0H,00H
+ DB 00H,0FH,10H,20H,20H,10H,0FH,00H;0
+
+C1 DB 00H,10H,10H,0F8H,00H,00H,00H,00H
+ DB 00H,20H,20H,3FH,20H,20H,00H,00H;1
+C2 DB 00H,70H,08H,08H,08H,88H,70H,00H
+ DB 00H,30H,28H,24H,22H,21H,30H,00H;2
+C3 DB 00H,30H,08H,88H,88H,48H,30H,00H
+ DB 00H,18H,20H,20H,20H,11H,0EH,00H;3
+C4 DB 00H,00H,0C0H,20H,10H,0F8H,00H,00H
+ DB 00H,07H,04H,24H,24H,3FH,24H,00H;4
+C5 DB 00H,0F8H,08H,88H,88H,08H,08H,00H
+ DB 00H,19H,21H,20H,20H,11H,0EH,00H;5
+
+C6 DB 00H,0E0H,10H,88H,88H,18H,00H,00H
+ DB 00H,0FH,11H,20H,20H,11H,0EH,00H;6
+C7 DB 00H,38H,08H,08H,0C8H,38H,08H,00H
+ DB 00H,00H,00H,3FH,00H,00H,00H,00H;7
+C8 DB 00H,70H,88H,08H,08H,88H,70H,00H
+ DB 00H,1CH,22H,21H,21H,22H,1CH,00H;8
+C9 DB 00H,0E0H,10H,08H,08H,10H,0E0H,00H
+ DB 00H,00H,31H,22H,22H,11H,0FH,00H;9
+
+TEMP DB 32 DUP(0) ;临时字模数据区
+X DB 0 ;显示位置的起始行号
+Y DB 0 ;显示位置的起始列号
+DATA	ENDS
+EXTRA	SEGMENT		;附加段
+EXTRA	ENDS
+STACK SEGMENT STACK ;准备定义堆栈段
+STP DW 100 DUP(?) ;预先定义的堆栈深度
+LEN EQU $-STP
+STACK ENDS ;堆栈段定义结束
+CODE SEGMENT;定义代码段		
+    ASSUME  CS:CODE, DS:DATA,ES:EXTRA,SS:STACK
+START: 
+        MOV AX,DATA
+        MOV DS,AX    
+       ;;;;;;;;;;;
+       ;存储器扩展部分；
+        MOV AX, 08200H	
+	MOV DS, AX     ;ROM地址初始化
+        MOV AX, 0E300H   ;RAM地址初始化
+        MOV ES, AX        
+        MOV SI, 0
+        MOV DI, 0
+	MOV CX, 14H   ;复制信息大小
+        MOV AL, [SI]
+        MOV ES:[DI], AL
+	
+     ;进入循环，顺序存取
+cunchu: 
+	MOVSW
+	LOOP cunchu
+	;;;;;;;;;;;;;;
+		
+ MOV AX,DATA ;初始化数据段
+ MOV DS,AX
+ 
+ CALL INIT ;LCD初始化
+;准备显示字，SI<-字模位置,X->BL,Y->BH
+ MOV BL,X
+ MOV BH,Y
+ LEA SI,XI
+ CALL DISPCHN
+ MOV BL,1
+ MOV BH,0
+ LEA SI,BEI
+ CALL DISPCHN
+  MOV BL,2
+ MOV BH,0
+ LEA SI,SHI
+ CALL DISPCHN
+  MOV BL,3
+ MOV BH,0
+ LEA SI,DA
+ CALL DISPCHN
+  MOV BL,4
+ MOV BH,0
+ LEA SI,JI
+ CALL DISPCHN
+  MOV BL,5
+ MOV BH,0
+ LEA SI,GONG
+ CALL DISPCHN
+  MOV BL,6
+ MOV BH,0
+ LEA SI,XUE
+ CALL DISPCHN
+  MOV BL,7
+ MOV BH,0
+ LEA SI,YUAN
+ CALL DISPCHN
+ MOV BL,0
+ MOV BH,1
+ LEA SI,WEI
+ CALL DISPCHN
+  MOV BL,1
+ MOV BH,1
+ LEA SI,GI
+ CALL DISPCHN
+ MOV BL,2
+ MOV BH,1
+ LEA SI,OP
+ CALL DISPCHN
+  MOV BL,3
+ MOV BH,1
+ LEA SI,LI
+ CALL DISPCHN
+  MOV BL,4
+ MOV BH,1
+ LEA SI,QI
+ CALL DISPCHN
+   MOV BL,5
+ MOV BH,1
+ LEA SI,MO
+ CALL DISPCHN
+   MOV BL,6
+ MOV BH,1
+ LEA SI,SHE
+ CALL DISPCHN
+    MOV BL,7
+ MOV BH,1
+ LEA SI,JI
+ CALL DISPCHN
+     MOV BL,0
+ MOV BH,2
+ LEA SI,YU
+ CALL DISPCHN
+     MOV BL,1
+ MOV BH,2
+ LEA SI,ZHOU
+ CALL DISPCHN
+;准备显示半角数字2,SI<-2的字模区首地址
+;列号->BL,行号->BH，因半角数字与全角汉字字模存储
+; 空间数不同，故用不同的子程序来显示
+ MOV BL,0
+ MOV BH,3
+ LEA SI,C2
+ LEA DI,C0
+ LEA BP,TEMP
+ CALL FULLCHA
+  MOV BL,1
+ MOV BH,3
+ LEA SI,C2
+ LEA DI,C2
+ LEA BP,TEMP
+ CALL FULLCHA
+ MOV BL,2
+ MOV BH,3
+ LEA SI,C3
+ LEA DI,C1
+ LEA BP,TEMP
+ CALL FULLCHA
+  MOV BL,3
+ MOV BH,3
+ LEA SI,C6
+ LEA DI,C0
+ LEA BP,TEMP
+ CALL FULLCHA
+  MOV BL,4
+ MOV BH,3
+ LEA SI,C7
+ LEA DI,C2
+ LEA BP,TEMP
+  CALL FULLCHA
+  MOV BL,5
+ MOV BH,3
+ LEA SI,C0
+LEA DI,C6
+LEA BP,TEMP
+ CALL FULLCHA
+
+;显示完一个汉字和一个数字，在原地循环等待
+ JMP JTD
+
+INIT PROC NEAR ;LCD与8255初始化子程序
+ MOV AL,10000000B 
+ MOV DX,PCONT
+ OUT DX,AL ;INIT 8255
+ MOV AL,00000001B ;INIT LCD
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,RESET ;RESET
+ MOV DX,PORTA
+ OUT DX,AL
+ NOP 
+
+ MOV AL,00000000B
+ MOV DX,PORTB
+ OUT DX,AL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,DISP_ON ;DISP ON
+ MOV DX,PORTA
+ OUT DX,AL
+ NOP
+
+ MOV AL,00000000B 
+ MOV DX,PORTB
+ OUT DX,AL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,ADCA ;ADC
+ INC AL
+ MOV DX,PORTA
+ OUT DX,AL
+
+ NOP
+ MOV AL,00000000B 
+ MOV DX,PORTB
+ OUT DX,AL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,DISP_ALL ;DISP ALL
+ MOV DX,PORTA
+ OUT DX,AL
+
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB 
+ OUT DX,AL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,DISP_NOR ;DISP NOR
+ MOV DX,PORTA
+ OUT DX,AL
+
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB
+ OUT DX,AL 
+ RET
+INIT ENDP 
+;以下为汉字显示子程序
+DISPCHN PROC NEAR
+ PUSH CX
+ PUSH DX
+ PUSH AX
+
+ PUSH DI
+ PUSH SI
+ MOV DI,BX
+ MOV CL,4
+ SHL BL,CL 
+ MOV AL,BL
+ AND BL, 0FH
+ MOV CL,4
+ SHR AL,CL
+ ADD AL,COLHIGH
+ ADD BL,COLLOW
+
+ MOV BH,AL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,BH ;COL HIGH 
+ MOV DX,PORTA
+ OUT DX,AL
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB
+
+ OUT DX,AL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,BL ;COL LOW
+ MOV DX,PORTA
+ OUT DX,AL
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB
+
+ OUT DX,AL
+ MOV BX,DI
+ MOV BL,BH
+ SHL BL,1
+ ADD BL,PAGE0
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,BL ;ROW 1
+ MOV DX,PORTA
+
+ OUT DX,AL
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB
+ OUT DX,AL
+ MOV CX,16
+HIGHE:
+ MOV AL,00000011B
+ MOV DX,PORTB
+ OUT DX,AL
+DATA1:
+ MOV AL,[SI]
+
+ MOV DX,PORTA
+ OUT DX,AL
+ NOP
+ NOP
+ INC SI
+DATAE:
+ MOV AL,00000010B
+ MOV DX,PORTB
+ OUT DX,AL 
+ NOP
+ NOP
+
+ LOOP HIGHE
+ MOV BX,DI
+ MOV BL,BH
+ SHL BL,1
+ ADD BL,PAGE0
+ INC BL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP 
+ MOV AL,BL ;ROW 2
+
+ MOV DX,PORTA
+ OUT DX,AL
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB
+ OUT DX,AL
+ MOV BX,DI
+ MOV CL,4
+ SHL BL,CL
+ MOV AL,BL
+ AND BL,0FH
+
+ MOV CL,4
+ SHR AL,CL
+ ADD AL,COLHIGH
+ ADD BL,COLLOW
+ MOV BH,AL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,BH ;COL HIGH
+ MOV DX,PORTA
+
+ OUT DX,AL
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB
+ OUT DX,AL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,BL ;COL LOW
+ MOV DX,PORTA
+
+ OUT DX,AL
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB
+ OUT DX,AL
+ POP SI
+ ADD SI,16
+ MOV CX,16
+HIGHE2:
+ MOV AL,00000011B
+ MOV DX,PORTB
+
+ OUT DX,AL
+DATA2:
+ MOV AL,[SI]
+ MOV DX,PORTA
+ OUT DX,AL
+ NOP
+ NOP
+ INC SI
+DATAE2:
+ MOV AL,00000010B
+ MOV DX,PORTB
+
+ OUT DX,AL
+ NOP
+ NOP
+ LOOP HIGHE2
+ POP DI
+ POP AX
+ POP DX
+ POP CX
+ RET
+DISPCHN ENDP
+;以下为显示半角字母、数字的子程序
+
+DISPCHA PROC NEAR
+ PUSH CX
+ PUSH DX
+ PUSH AX
+ PUSH DI
+ PUSH SI
+ MOV DI,BX
+ MOV CL,4 ;4
+ SHL BL,CL
+ MOV AL,BL
+ AND BL,0FH ;0F
+
+ MOV CL,4 ;4
+ SHR AL,CL
+ ADD AL,COLHIGH
+ ADD BL,COLLOW
+ MOV BH,AL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,BH ;COL HIGH
+ MOV DX,PORTA
+
+ OUT DX,AL
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB
+ OUT DX,AL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,BL ;COL LOW
+ MOV DX,PORTA
+
+ OUT DX,AL
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB
+ OUT DX,AL
+ MOV BX,DI
+ MOV BL,BH ;Y 
+ SHL BL,1
+ ADD BL,PAGE0
+ MOV AL,00000001B
+ MOV DX,PORTB
+
+ OUT DX,AL
+ NOP
+ MOV AL,BL ;ROW 1
+ MOV DX,PORTA
+ OUT DX,AL
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB
+ OUT DX,AL
+ MOV CX,8
+HIGHEC:
+ MOV AL,00000011B
+ MOV DX,PORTB
+ OUT DX,AL
+DATA1C:
+ MOV AL,[SI]
+ MOV DX,PORTA
+ OUT DX,AL
+ NOP
+ NOP
+ INC SI
+DATAEC:
+ MOV AL,00000010B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ NOP
+ LOOP HIGHEC
+ MOV BX,DI
+ MOV BL,BH
+ SHL BL,1
+ ADD BL,PAGE0
+ INC BL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,BL ;ROW 2
+ MOV DX,PORTA
+ OUT DX,AL
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB
+ OUT DX,AL
+ MOV BX,DI
+ MOV CL,4 ;4
+ SHL BL,CL
+ MOV AL,BL
+ AND BL, 0FH ;0F
+ MOV CL,4 ;4
+ SHR AL,CL
+ ADD AL,COLHIGH
+ ADD BL,COLLOW
+ MOV BH,AL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,BH ;COL HIGH
+ MOV DX,PORTA
+ OUT DX,AL
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB
+ OUT DX,AL
+ MOV AL,00000001B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ MOV AL,BL ;COL LOW
+ MOV DX,PORTA
+ OUT DX,AL
+ NOP
+ MOV AL,00000000B
+ MOV DX,PORTB
+ OUT DX,AL
+ POP SI
+ ADD SI,8
+ MOV CX,8
+HIGHE2C:
+ MOV AL,00000011B
+ MOV DX,PORTB
+ OUT DX,AL
+DATA2C:
+ MOV AL,[SI]
+ MOV DX,PORTA
+ OUT DX,AL
+ NOP
+ NOP
+ INC SI
+DATAE2C:
+ MOV AL,00000010B
+ MOV DX,PORTB
+ OUT DX,AL
+ NOP
+ NOP
+ LOOP HIGHE2C
+ POP DI
+ POP AX
+ POP DX
+ POP CX
+ RET
+DISPCHA ENDP
+FULLCHA PROC NEAR
+ PUSH SI
+ PUSH DI
+ PUSH CX
+ PUSH BX
+ PUSH AX
+ MOV CX,4
+ MOV BX,BP
+TLOP1:
+ MOV AX,[SI]
+ MOV [BX],AX
+ INC SI
+ INC SI
+
+ INC BX
+ INC BX
+ LOOP TLOP1
+ MOV CX,4
+TLOP2:
+ MOV AX,[DI]
+ MOV [BX],AX
+ INC DI
+ INC DI
+ INC BX
+ INC BX
+
+ LOOP TLOP2
+ MOV CX,4
+TLOP3:
+ MOV AX,[SI]
+ MOV [BX],AX
+ INC SI
+ INC SI
+ INC BX
+ INC BX
+ LOOP TLOP3
+ MOV CX,4
+
+TLOP4:
+ MOV AX,[DI]
+ MOV [BX],AX
+ INC DI
+ INC DI
+ INC BX
+ INC BX
+ LOOP TLOP4
+ POP AX
+ POP BX
+ POP CX
+
+ POP DI
+ POP SI
+ MOV SI,BP
+ CALL DISPCHN
+ RET
+FULLCHA ENDP
+	;;;;;;;;;;;;;
+        ;交通灯部分；
+JTD:	
+    MOV AX, DATA
+    MOV DS, AX  
+         ;8255初始化    
+    MOV DX, DZ_LED1
+    MOV AL, 81H             ;设置方式0，PA、PB输出,PC下半口输入
+    OUT DX, AL      
+    
+    MOV DX, DZ_LED2
+    MOV AL, 80H             ;设置方式0，PA、PB输出
+    OUT DX, AL                                   
+    
+    MOV DX, DZ_LED3
+    MOV AL, 80H             ;设置方式0，PA、PB输出
+    OUT DX, AL 
+    
+    MOV DX, DZ_LED4
+    MOV AL, 80H             ;设置方式0，PA、PB输出
+    OUT DX, AL 
+    ;清屏
+    MOV AL,00H             
+    MOV DX, DZA_1      
+    OUT DX, AL  
+    MOV AL,00H
+    MOV DX, DZB_1
+    OUT DX, AL
+    MOV AL,0FFH              
+    MOV DX, DZA_2
+    OUT DX, AL  
+    MOV AL,0FFH
+    MOV DX, DZB_2
+    OUT DX, AL    
+    MOV AL,00H              
+    MOV DX, DZA_3
+    OUT DX, AL  
+    MOV AL,00H
+    MOV DX, DZB_3
+    OUT DX, AL 
+    MOV AL,0FFH              
+    MOV DX, DZA_4
+    OUT DX, AL  
+    MOV AL,0FFH
+    MOV DX, DZB_4
+    OUT DX, AL           
+    
+        MOV AX,DATA
+        MOV DS,AX    
+        MOV AX, EXTRA
+        MOV ES,AX
+        
+        MOV AX,STACK
+        MOV SS,AX
+       
+        ; 初始化LED8255
+        MOV DX,LED_8255_1
+        MOV AL,10000000B
+        OUT DX,AL
+
+        MOV DX,LED_8255_2
+        MOV AL,10000000B
+        OUT DX,AL
+	
+	MOV DX,LED_8255
+        MOV AL,10010000B
+        OUT DX,AL
+       
+        ; 8259初始化
+        MOV DX,ICW1
+        MOV AL, 00011011B   ; 电平触发
+        OUT DX,AL
+        
+        MOV DX,ICW2
+        MOV AL,60H        ;中断向量编号基础地址 IR0-IR7对应中断向量60h-67h
+        OUT DX,AL
+        
+        MOV DX,ICW4
+        MOV AL,00000001B  ; 非自动中断
+        OUT DX,AL
+        
+        MOV DX,OCW1
+        MOV AL,10000000B  ; 开中断 IR0-IR3
+        OUT DX,AL 
+        
+       
+        MOV AX,00H         ;定义中断向量表
+        MOV ES,AX
+        
+	
+        MOV BX, 60H*4      ; 定义IR0的中断响应函数 为INT0
+        MOV AX,OFFSET INT0
+        MOV ES:[BX],AX 
+        
+        MOV AX,CS
+        MOV ES:[BX+2],AX  
+      ; 定义中断向量表
+ 
+	MOV AX,00H
+       MOV ES,AX
+        
+	
+       MOV BX, 61H*4      ; 定义IR1的中断响应函数 为INT1
+       MOV AX,OFFSET INT1
+       MOV ES:[BX],AX 
+        
+        MOV AX,CS
+      MOV ES:[BX+2],AX  
+      
+      	MOV AX,00H
+       MOV ES,AX
+        
+	
+       MOV BX, 62H*4      ; 定义IR2的中断响应函数 为INT2
+       MOV AX,OFFSET INT2
+       MOV ES:[BX],AX 
+        
+        MOV AX,CS
+       MOV ES:[BX+2],AX  
+      
+       MOV AX,00H
+       MOV ES,AX
+        
+	
+       MOV BX, 63H*4      ; 定义IR3的中断响应函数 为INT3
+       MOV AX,OFFSET INT3
+       MOV ES:[BX],AX 
+        
+        MOV AX,CS
+        MOV ES:[BX+2],AX  
+	
+       MOV AX,00H
+       MOV ES,AX
+        
+	
+       MOV BX, 64H*4      ; 定义IR3的中断响应函数 为INT3
+       MOV AX,OFFSET INT4
+       MOV ES:[BX],AX 
+        
+        MOV AX,CS
+        MOV ES:[BX+2],AX 
+	
+		
+       MOV AX,00H
+       MOV ES,AX
+	MOV BX, 65H*4      ; 定义IR3的中断响应函数 为INT3
+       MOV AX,OFFSET INT5
+       MOV ES:[BX],AX 
+        
+        MOV AX,CS
+        MOV ES:[BX+2],AX 
+        STI
+;东西向 直行道绿灯50秒，左转道红灯，人行道绿灯
+        ;等于0 右移
+L0:  
+     
+	MOV DX,PC0
+        MOV BX,OFFSET LED0
+        MOV AL,N
+        XLAT        
+        OUT DX,AL
+	
+	MOV AX,0E400H ;西方向 初始化RAM地址 存储的位置
+	MOV ES,AX     ;;;
+	
+        MOV DX,PB0
+        MOV AL,01100001B     ;61 
+        OUT DX,AL
+
+	MOV DI,CNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	;;;
+	
+	MOV AX,0E500H ;东方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	
+	MOV DX,PA0
+        MOV AL,01100001B      ;
+        OUT DX,AL
+
+	MOV DI,DNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	;;;
+	;此时南北方向全红
+	MOV DX,PC1
+	MOV BX,OFFSET LEDA
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+	
+	MOV AX,0E600H ;北方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	MOV DX,PB1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DI,ENT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+
+	
+	MOV AX,0E700H ;南方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	MOV DX,PA1
+	MOV AL,10001001B
+	OUT DX,AL	
+	MOV DI,FNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	
+	;;;;
+         MOV CX,3H
+        CALL DELAY
+        INC N
+	INC N1
+
+        CMP N,0AH
+        JNZ L0
+	MOV N,00H
+	MOV N1,00H
+	INC CNT
+	INC CNT
+	INC DNT
+	INC DNT
+	INC ENT
+	INC ENT
+	INC FNT
+	INC FNT
+;东西向 直行道绿灯50秒，左转道红灯，人行道绿灯
+L1:
+        MOV DX,PC0
+        MOV BX,OFFSET LED1
+        MOV AL,N
+        XLAT        
+        OUT DX,AL
+
+        MOV DX,PB0
+        MOV AL,01100001B    
+        OUT DX,AL
+	
+	MOV DX,PA0
+        MOV AL,01100001B    
+        OUT DX,AL
+	;此时南北方向全红
+	MOV DX,PC1
+	MOV BX,OFFSET LEDB
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+	
+	MOV DX,PB1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DX,PA1
+	MOV AL,10001001B
+	OUT DX,AL
+	;;;;
+        MOV CX,3H
+        CALL DELAY
+        INC N
+	INC N1
+        CMP N,028H  ;
+        JNZ L1 
+	MOV N,00H
+	MOV N1,00H
+;东西向 直行道绿灯闪烁5秒，左转道红灯，人行道绿灯
+L2:
+       MOV DX,PC0
+        MOV BX,OFFSET LED5
+        MOV AL,N
+        XLAT        
+        OUT DX,AL
+	
+        MOV DX,PB0
+        MOV AL,01100001B     
+	
+        OUT DX,AL
+	MOV DX,PA0
+        MOV AL,01100001B     
+        OUT DX,AL
+	;此时南北方向全红
+	MOV DX,PC1
+	MOV BX,OFFSET LEDC
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+	MOV DX,PB1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DX,PA1
+	MOV AL,10001001B
+	OUT DX,AL
+	;;;;
+         MOV CX,2H
+        CALL DELAY
+	
+
+	
+
+	MOV DX,PB0
+        MOV AL,01000001B   ;
+        OUT DX,AL	
+
+	MOV DX,PA0
+        MOV AL,01000001B    
+        OUT DX,AL
+         MOV CX,1H
+        CALL DELAY
+        INC N
+	INC N1
+        CMP N,05H
+        JNZ L2
+	MOV N,00H
+;东西向 直行道黄灯5秒，左转道红灯，人行道绿灯
+L3:
+        MOV AX,0E400H ;西方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	
+        MOV DX,PB0
+        MOV AL,01010001B    ;51
+        OUT DX,AL
+	
+	MOV DI,CNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+
+	
+	MOV AX,0E500H ;东方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	
+         MOV DX,PA0
+        MOV AL,01010001B    
+        OUT DX,AL
+	
+	MOV DI,DNT
+	MOV ES:[DI],AL
+	
+        MOV DX,PC0
+        MOV BX,OFFSET LED5
+        MOV AL,N
+       XLAT        
+       OUT DX,AL
+        	;此时南北方向全红
+	MOV DX,PC1
+	MOV BX,OFFSET LEDC
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+        
+	MOV AX,0E600H ;北方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+
+	MOV DX,PB1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DI,ENT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	        MOV AX,0E700H ;南方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+
+	MOV DX,PA1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DI,FNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	;;;;
+        MOV CX,3H
+        CALL DELAY
+        INC N
+	INC N1
+        CMP N,05H
+        JNZ L3
+	MOV N,00H
+	MOV N1,00H
+	INC CNT
+	INC CNT
+	INC DNT
+	INC DNT
+	INC ENT
+	INC ENT
+	INC FNT
+	INC FNT
+;东西向 左转道绿灯30秒，直行道红灯，人行道红灯
+L4:
+        MOV AX,0E400H ;西方向 初始化RAM地址 存储的位置
+	MOV ES,AX     ;;;
+	
+	
+        MOV DX,PB0
+        MOV AL,10001100B     ;8C ;         61 主 人行道 绿       ；51 主黄 人绿  8C主 人行道 红  左转绿
+	 OUT DX,AL
+	 
+	MOV DI,CNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	
+       	MOV AX,0E500H ;东方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	
+
+	
+         MOV DX,PA0
+        MOV AL,10001100B     
+        OUT DX,AL
+		MOV DI,DNT
+	MOV ES:[DI],AL
+	
+        MOV DX,PC0
+        MOV BX,OFFSET LED30
+        MOV AL,N
+        XLAT        
+        OUT DX,AL
+        	;此时南北方向全红
+	MOV DX,PC1
+	MOV BX,OFFSET LEDD
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+		MOV AX,0E600H ;北方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	
+	MOV DX,PB1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DI,ENT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	        MOV AX,0E700H ;南方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+
+	MOV DX,PA1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DI,FNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	;;;;
+        MOV CX,03H
+        CALL DELAY
+        INC N
+	INC N1
+        CMP N,01EH
+        JNZ L4
+	MOV N,00H
+	MOV N1,00H
+	INC CNT
+	INC CNT
+	INC DNT
+	INC DNT
+	INC ENT
+	INC ENT
+	INC FNT
+	INC FNT
+;东西向 左转道绿灯闪烁5秒，直行道红灯，人行道红灯
+L5:
+        MOV DX,PC0
+        MOV BX,OFFSET LED5
+        MOV AL,N
+        XLAT        
+        OUT DX,AL
+       ;此时南北方向全红
+	MOV DX,PC1
+	MOV BX,OFFSET LEDE
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+	MOV DX,PB1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DX,PA1
+	MOV AL,10001001B
+	OUT DX,AL
+	;;;;
+
+	
+        MOV DX,PB0
+        MOV AL,10001100B      ;8C主 人行道 红  左转绿
+        OUT DX,AL
+
+	 MOV DX,PA0
+        MOV AL,10001100B     
+        OUT DX,AL
+          MOV CX,2H
+        CALL DELAY
+	
+	
+	
+
+	 MOV DX,PB0
+        MOV AL,10001000B     ;
+        OUT DX,AL
+	MOV DX,PA0
+        MOV AL,10001000B     
+        OUT DX,AL
+        MOV CX,01H
+        CALL DELAY
+        INC N
+	INC N1
+        CMP N,05H
+        JNZ L5
+        MOV N,00H
+
+;东西向 左转道黄灯5秒，直行道红灯，人行道红灯
+L6:
+        MOV DX,PC0
+        MOV BX,OFFSET LED5
+        MOV AL,N
+       XLAT        
+        OUT DX,AL
+		MOV AX,0E400H ;西方向 初始化RAM地址 存储的位置
+	MOV ES,AX     ;;;
+	
+
+        MOV DX,PB0
+        MOV AL,10001010B     ;8A   8C主 人行道 红  左转黄
+        OUT DX,AL
+		MOV DI,CNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	       	MOV AX,0E500H ;东方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	
+
+	  MOV DX,PA0
+        MOV AL,10001010B     ;
+        OUT DX,AL
+		MOV DI,DNT
+	MOV ES:[DI],AL
+		;此时南北方向全红
+	MOV DX,PC1
+	MOV BX,OFFSET LEDE
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+		MOV AX,0E600H ;北方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+
+	MOV DX,PB1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DI,ENT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	        MOV AX,0E700H ;南方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+
+	MOV DX,PA1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DI,FNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	;;;;
+        MOV CX,3H
+        CALL DELAY
+        INC N
+	INC N1
+        CMP N,05H
+        JNZ L6
+        MOV N,00H
+	MOV N1,00H
+	INC CNT
+	INC CNT
+	INC DNT
+	INC DNT
+	INC ENT
+	INC ENT
+	INC FNT
+	INC FNT
+;东西向 全红灯  南北直行道绿灯50秒 左转道红灯 人行道绿灯
+R0:
+      MOV DX,PC0
+	MOV BX,OFFSET LEDA
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+	MOV AX,0E400H ;西方向 初始化RAM地址 存储的位置
+	MOV ES,AX     ;;;
+	
+
+        MOV DX,PB0
+        MOV AL,10001001B     ;89 西东全红
+        OUT DX,AL
+	MOV DI,CNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	       	MOV AX,0E500H ;东方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	
+	
+	 MOV DX,PA0
+        MOV AL,10001001B     
+        OUT DX,AL
+	MOV DI,DNT
+	MOV ES:[DI],AL
+	;此时西东全红，南北方向启动 先主道绿
+        MOV DX,PC1
+        MOV BX,OFFSET LED0
+        MOV AL,N
+        XLAT        
+        OUT DX,AL
+		MOV AX,0E600H ;北方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+
+        MOV DX,PB1
+        MOV AL,01100001B     
+        OUT DX,AL
+	MOV DI,ENT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	        MOV AX,0E700H ;南方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+
+	MOV DX,PA1
+        MOV AL,01100001B     
+        OUT DX,AL
+	MOV DI,FNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+        MOV CX,3H
+        CALL DELAY
+        INC N
+	INC N1
+        CMP N,0AH
+        JNZ R0
+        MOV N,00H
+	MOV N1,00H
+	INC CNT
+	INC CNT
+	INC DNT
+	INC DNT
+	INC ENT
+	INC ENT
+	INC FNT
+	INC FNT
+	;东西向 全红灯  南北直行道绿灯50秒 左转道红灯 人行道绿灯
+R0_1:
+        MOV DX,PC0
+	MOV BX,OFFSET LEDB
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+
+
+	
+        MOV DX,PB0
+        MOV AL,10001001B     
+        OUT DX,AL
+
+	
+	 MOV DX,PA0
+        MOV AL,10001001B     
+        OUT DX,AL
+	;此时西东全红，南北方向启动 先主道绿
+        MOV DX,PC1
+        MOV BX,OFFSET LED1
+        MOV AL,N
+        XLAT        
+        OUT DX,AL
+        MOV DX,PB1
+        MOV AL,01100001B     
+        OUT DX,AL
+	MOV DX,PA1
+        MOV AL,01100001B     
+        OUT DX,AL
+        MOV CX,3H
+        CALL DELAY
+        INC N
+	INC N1
+        CMP N,028H
+        JNZ R0_1
+        MOV N,00H
+	MOV N1,00H
+
+;南北方向 直行道绿灯闪烁5秒 左转道红灯 人行道绿灯
+R1:
+        MOV DX,PC1
+        MOV BX,OFFSET LED5
+        MOV AL,N
+        XLAT        
+        OUT DX,AL
+	
+	MOV DX,PC0
+	MOV BX,OFFSET LEDC
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+
+
+        MOV DX,PB0
+        MOV AL,10001001B  ;89   
+        OUT DX,AL
+
+	 MOV DX,PA0
+        MOV AL,10001001B     
+        OUT DX,AL
+	
+        MOV DX,PB1
+        MOV AL,01100001B    
+        OUT DX,AL
+	 MOV DX,PA1
+        MOV AL,01100001B     
+        OUT DX,AL
+
+            MOV CX,2H
+        CALL DELAY
+	MOV DX,PB1
+        MOV AL,01000001B   
+        OUT DX,AL
+	MOV DX,PA1
+        MOV AL,01000001B     
+        OUT DX,AL
+         MOV CX,1H
+        CALL DELAY
+        INC N
+	INC N1
+        CMP N,05H
+        JNZ R1
+	MOV N,00H
+
+;南北方向 直行道黄灯5秒 左转道红灯 人行道绿灯
+R2:
+        	MOV AX,0E600H ;北方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+
+	MOV DX,PB1
+        MOV AL,01010001B     
+        OUT DX,AL
+	MOV DI,ENT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	        MOV AX,0E700H ;南方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+
+         MOV DX,PA1
+        MOV AL,01010001B     
+        OUT DX,AL
+	MOV DI,FNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+        MOV DX,PC1
+        MOV BX,OFFSET LED5
+        MOV AL,N
+        XLAT        
+       OUT DX,AL
+       
+         MOV DX,PC0
+	MOV BX,OFFSET LEDC
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+		MOV AX,0E400H ;西方向 初始化RAM地址 存储的位置
+	MOV ES,AX     ;;;
+	
+
+        MOV DX,PB0
+        MOV AL,10001001B   ;89 
+        OUT DX,AL
+		MOV DI,CNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	       	MOV AX,0E500H ;东方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	
+
+	 MOV DX,PA0
+        MOV AL,10001001B     
+        OUT DX,AL
+	MOV DI,DNT
+	MOV ES:[DI],AL
+        MOV CX,3H
+        CALL DELAY
+        INC N
+	INC N1
+        CMP N,05H
+        JNZ R2
+	MOV N,00H
+	MOV N1,00H
+	INC CNT
+	INC CNT
+	INC DNT
+	INC DNT
+	INC ENT
+	INC ENT
+	INC FNT
+	INC FNT
+;南北方向 左转道绿灯30秒 直行道和人行道红灯
+R3:
+       	MOV AX,0E600H ;北方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	
+       MOV DX,PB1
+        MOV AL,10001100B     
+        OUT DX,AL
+	
+	MOV DI,ENT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	        MOV AX,0E700H ;南方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+
+         MOV DX,PA1
+        MOV AL,10001100B    
+        OUT DX,AL
+	MOV DI,FNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+        MOV DX,PC1
+        MOV BX,OFFSET LED30
+        MOV AL,N
+        XLAT        
+        OUT DX,AL
+
+           MOV DX,PC0
+	MOV BX,OFFSET LEDD
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+		MOV AX,0E400H ;西方向 初始化RAM地址 存储的位置
+	MOV ES,AX     ;;;
+	
+
+        MOV DX,PB0
+        MOV AL,10001001B   ;89  
+        OUT DX,AL
+		MOV DI,CNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	
+	       	MOV AX,0E500H ;东方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	
+	
+	 MOV DX,PA0
+        MOV AL,10001001B   
+        OUT DX,AL
+        MOV DI,DNT
+	MOV ES:[DI],AL
+        MOV CX,03H
+        CALL DELAY
+        INC N
+	INC N1
+        CMP N,01EH
+        JNZ R3
+	MOV N,00H
+	MOV N1,00H
+	INC CNT
+	INC CNT
+	INC DNT
+	INC DNT
+	INC ENT
+	INC ENT
+	INC FNT
+	INC FNT
+;南北方向 左转道绿灯闪烁5秒 直行道和人行道红灯
+R4:
+       MOV DX,PC1
+       MOV BX,OFFSET LED5
+        MOV AL,N
+        XLAT        
+        OUT DX,AL
+
+         MOV DX,PC0
+	MOV BX,OFFSET LEDE
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+
+	
+
+        MOV DX,PB0
+        MOV AL,10001001B     
+        OUT DX,AL
+
+	 MOV DX,PA0
+        MOV AL,10001001B     
+        OUT DX,AL
+
+        MOV DX,PB1
+        MOV AL,10001100B    
+        OUT DX,AL
+	 MOV DX,PA1
+        MOV AL,10001100B     
+        OUT DX,AL
+         MOV CX,2H
+        CALL DELAY
+	 MOV DX,PB1
+        MOV AL,10001000B   
+        OUT DX,AL
+	MOV DX,PA1
+        MOV AL,10001000B     
+        OUT DX,AL
+        MOV CX,01H
+        CALL DELAY
+        INC N
+	INC N1
+        CMP N,05H
+        JNZ R4
+        MOV N,00H  
+
+;南北方向 左转道黄灯5秒 直行道和人行道红灯
+R5:	
+        MOV DX,PC1
+        MOV BX,OFFSET LED5
+        MOV AL,N
+      XLAT        
+        OUT DX,AL
+		MOV AX,0E600H ;北方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+
+        MOV DX,PB1
+        MOV AL,10001010B     
+        OUT DX,AL
+	MOV DI,ENT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	
+	        MOV AX,0E700H ;南方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+
+	
+	  MOV DX,PA1
+        MOV AL,10001010B    
+        OUT DX,AL	
+	MOV DI,FNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+      MOV DX,PC0
+	MOV BX,OFFSET LEDE
+	MOV AL,N1
+	XLAT
+	OUT DX,AL
+		MOV AX,0E400H ;西方向 初始化RAM地址 存储的位置
+	MOV ES,AX     ;;;
+	
+
+        MOV DX,PB0
+        MOV AL,10001001B   ;89 
+        OUT DX,AL
+		MOV DI,CNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	       	MOV AX,0E500H ;东方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	
+	
+	 MOV DX,PA0
+        MOV AL,10001001B     
+        OUT DX,AL
+	MOV DI,DNT
+	MOV ES:[DI],AL
+	
+        MOV CX,3H
+        CALL DELAY
+        INC N
+	INC N1
+        CMP N,05H
+        JNZ R5
+        MOV N,00H
+	MOV N1,00H
+	INC CNT
+	INC CNT
+	INC CNT
+	INC CNT
+	INC DNT
+	INC DNT
+	INC DNT
+	INC DNT
+	INC ENT
+	INC ENT
+	INC ENT 
+	INC ENT
+	INC FNT
+	INC FNT
+	INC FNT
+	INC FNT
+        JMP L0
+	;交通灯第一轮结束 跳转到L0重新开始
+       
+; INT0 西
+INT0 PROC
+     CLI
+     I1:
+        MOV DX,PC0
+	MOV AL,99H	
+	OUT DX,AL
+        MOV DX,PC1
+	MOV AL,99H	
+	OUT DX,AL
+	
+	MOV AX,0E400H ;西方向 初始化RAM地址 存储的位置
+	MOV ES,AX     ;;;
+        MOV DX,PB0
+	MOV AL,10100100B    ;A4 
+	OUT DX,AL
+	MOV BX,CNT      ;;RAM 偏移地址
+	MOV ES:[BX],AL   ;;存入目的地址
+	
+        MOV AX,0E500H ;东方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+        MOV DX,PA0
+	MOV AL,10001001B       ;89
+	OUT DX,AL
+		MOV BX,DNT
+	MOV ES:[BX],AL
+
+	      MOV AX,0E700H ;南方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	
+        MOV DX,PA1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DI,FNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	
+	MOV AX,0E600H ;北方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	MOV DX,PB1
+	MOV AL,10001001B
+	OUT DX,AL
+		MOV DI,ENT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	MOV DX,PA
+        IN AL,DX
+	TEST AL,0001B
+	JNE I1
+	
+	INC CNT
+	INC CNT
+	INC DNT
+	INC DNT
+	INC ENT
+	INC ENT
+	INC FNT
+	INC FNT
+        MOV DX,OCW2
+        MOV AL,20H
+        OUT DX,AL
+     STI
+  IRET
+INT0 ENDP
+;东
+INT1 PROC
+
+    CLI
+   I2:
+        MOV DX,PC0
+	MOV AL,99H	
+	OUT DX,AL
+	 MOV DX,PC1
+	MOV AL,99H	
+	OUT DX,AL
+	
+	    MOV AX,0E500H ;东方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+      MOV DX,PA0
+	MOV AL,10100100B     
+	OUT DX,AL
+		MOV BX,DNT
+	MOV ES:[BX],AL
+	
+	MOV AX,0E400H ;西方向 初始化RAM地址 存储的位置
+	MOV ES,AX     ;;;
+       MOV DX,PB0
+	MOV AL,10001001B       
+	OUT DX,AL
+	MOV BX,CNT      ;;RAM 偏移地址
+	MOV ES:[BX],AL   ;;存入目的地址
+	
+	      MOV AX,0E700H ;南方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+
+	  MOV DX,PA1
+	MOV AL,10001001B
+	OUT DX,AL
+		MOV DI,FNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	
+	MOV AX,0E600H ;北方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	MOV DX,PB1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DI,ENT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	
+	MOV DX,PA
+        IN AL,DX
+	TEST AL,0010B
+	JNE I2
+	INC CNT
+	INC CNT
+	INC DNT
+	INC DNT
+	INC ENT
+	INC ENT
+	INC FNT
+	INC FNT
+        MOV DX,OCW2
+        MOV AL,20H
+       OUT DX,AL
+    STI
+  IRET
+INT1 ENDP
+;北
+INT2 PROC
+
+    CLI
+   I3:
+        MOV DX,PC0
+	MOV AL,99H	
+	OUT DX,AL
+	 MOV DX,PC1
+	MOV AL,99H	
+	OUT DX,AL
+	MOV AX,0E600H ;北方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	MOV DX,PB1
+	MOV AL,10100100B
+	OUT DX,AL
+	MOV DI,ENT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	
+	 MOV AX,0E500H ;东方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+      MOV DX,PA0
+	MOV AL,10001001B     
+	OUT DX,AL
+	MOV BX,DNT
+	MOV ES:[BX],AL
+	
+	MOV AX,0E400H ;西方向 初始化RAM地址 存储的位置
+	MOV ES,AX     ;;;
+       MOV DX,PB0
+	MOV AL,10001001B       
+	OUT DX,AL
+	MOV BX,CNT      ;;RAM 偏移地址
+	MOV ES:[BX],AL   ;;存入目的地址
+	
+	      MOV AX,0E700H ;南方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	
+	 MOV DX,PA1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DI,FNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	
+	MOV DX,PA
+        IN AL,DX
+	TEST AL,0100B
+	JNE I3
+	INC CNT
+	INC CNT
+	INC DNT
+	INC DNT
+	INC ENT
+	INC ENT
+	INC FNT
+	INC FNT
+        MOV DX,OCW2
+        MOV AL,20H
+       OUT DX,AL
+    STI
+  IRET
+INT2 ENDP
+;南
+INT3 PROC
+
+    CLI
+   I4:
+        MOV DX,PC0
+	MOV AL,99H	
+	OUT DX,AL
+	 MOV DX,PC1
+	MOV AL,99H	
+	OUT DX,AL
+       MOV AX,0E700H ;南方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	MOV DX,PA1
+	MOV AL,10100100B
+	OUT DX,AL
+	MOV DI,FNT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	
+	 MOV AX,0E500H ;东方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+      MOV DX,PA0
+	MOV AL,10001001B     
+	OUT DX,AL
+	MOV BX,DNT
+	MOV ES:[BX],AL
+	
+	MOV AX,0E400H ;西方向 初始化RAM地址 存储的位置
+	MOV ES,AX     ;;;
+       MOV DX,PB0
+	MOV AL,10001001B       
+	OUT DX,AL
+	MOV BX,CNT      ;;RAM 偏移地址
+	MOV ES:[BX],AL   ;;存入目的地址
+	
+	MOV AX,0E600H ;北方向 初始化RAM地址 存储的位置
+	MOV ES,AX
+	 MOV DX,PB1
+	MOV AL,10001001B
+	OUT DX,AL
+	MOV DI,ENT      ;;RAM 偏移地址
+	MOV ES:[DI],AL   ;;存入目的地址
+	
+	MOV DX,PA
+        IN AL,DX
+	TEST AL,1000B
+	JNE I4
+	INC CNT
+	INC CNT
+	INC DNT
+	INC DNT
+	INC ENT
+	INC ENT
+	INC FNT
+	INC FNT
+        MOV DX,OCW2
+        MOV AL,20H
+       OUT DX,AL
+    STI
+  IRET
+INT3 ENDP
+
+;DZ向右
+INT4 PROC
+     CLI
+     MOV SI,OFFSET(shi_1)                   
+     MOV DI,OFFSET(he)
+     MOV CX,40H      ;两个汉字 64	
+DZ1: PUSH CX
+     MOV CX,0110B
+DZ2:CALL DZ_MAIN    ;以当前字数据为起点 调用显示程序 显示6次 0110B  
+    DEC CX          ;例如一个汉字由1 2 3 4 5 6组成 第一次指针指向1 将1传入子程序，从1开始向后显示，第二次指向2 2传入子程序 从2开始向后显示
+    CMP CX,0        ;显示结束后 DI、SI后移 指向下一个字 以下一个字为起点 调用显示程序
+    JNZ DZ2         ;子程序实则是从0-32列循环遍历一次
+    INC SI
+    INC SI
+    INC DI
+    INC DI
+    POP CX
+    DEC CX
+    DEC CX           ;一列需要两个字的数据
+    CMP CX,0       ;显示完毕 结束
+    JNZ DZ1   
+    MOV DX,OCW2
+    MOV AL,20H
+    OUT DX,AL
+    STI
+  IRET
+INT4 ENDP
+;DZ向左
+INT5 PROC
+     CLI
+     MOV SI,OFFSET(WO)                   
+     MOV DI,OFFSET(X_1)
+     MOV CX, 20H  
+DZ3:     
+     PUSH CX
+     MOV CX,0110B    
+DZ4:
+    CALL DZ_MAIN1
+    DEC CX
+     CMP CX,0
+    JNZ DZ4
+    INC SI
+    INC SI
+    INC DI
+    INC DI
+    POP CX
+    DEC CX
+    CMP CX,0
+    JNZ DZ3   
+    MOV DX,OCW2
+     MOV AL,20H
+    OUT DX,AL
+    STI
+  IRET
+INT5 ENDP
+;显示点阵 向右  
+DZ_MAIN:
+    PUSH AX
+    PUSH BX
+    PUSH CX
+    PUSH DX
+    PUSH SI
+    PUSH DI      
+    MOV BX,1H
+    MOV CX,40H            ;一个汉字要显示占满32列 
+DZ_M:                           
+    MOV AL,0FFH             
+    MOV DX, DZA_2        
+    OUT DX, AL  
+    MOV AL,0FFH
+    MOV DX, DZB_2
+    OUT DX, AL 
+    MOV AL,0FFH             
+    MOV DX, DZA_4        
+    OUT DX, AL  
+    MOV AL,0FFH
+    MOV DX, DZB_4
+    OUT DX, AL         ;清空初始化  
+    MOV AX,[SI]                 
+    MOV DX,DZA_1                 
+    OUT DX,AL  
+    MOV AL,AH                  
+    MOV DX,DZB_1            
+    OUT DX,AL    
+    MOV AX,[DI]                
+    MOV DX,DZA_3                 
+    OUT DX,AL  
+    MOV AL,AH                   
+    MOV DX,DZB_3            
+    OUT DX,AL         ;控制行
+    
+    CMP CX, 20H       ;判断0-16列是否显示完
+    JBE DZ_M1         ;如果没有显示完，就置2有效 
+    MOV AX, BX 
+    NOT AX            ;因为行高电平有效 列低电平有效 所以要取反         
+    MOV DX,DZA_2
+    OUT DX,AL   
+    MOV AL,AH                  
+    MOV DX,DZB_2
+    OUT DX,AL     
+    MOV AL,0FFH                   
+    MOV DX,DZA_4
+    OUT DX,AL
+    MOV DX,DZB_4
+    OUT DX,AL         ;控制列
+    JMP DZ_M2      
+DZ_M1:                ;如果显示完 就置4有效 17-32列
+    MOV AX, BX
+    NOT AX   
+    MOV DX,DZA_4
+    OUT DX,AL
+    MOV AL,AH              
+    MOV DX,DZB_4
+    OUT DX,AL 
+    MOV AL,0FFH                   
+    MOV DX,DZA_2
+    OUT DX,AL
+    MOV DX,DZB_2
+    OUT DX,AL
+DZ_M2:          ;后移指针  
+    INC SI      
+    INC SI
+    INC DI
+    INC DI  
+    CALL DELAY_DZ 
+    CMP SI,OFFSET (shi_1+64)     ;判断是否显示完
+    JNZ DZ_M3                    ;没有则 跳转
+    MOV SI,OFFSET(shi_1)         ;相等，则重新将汉字传入         
+    MOV DI,OFFSET(he)
+DZ_M3:
+    ROR BX,1H        ;右移BX一位
+    DEC CX           ;第二列开始显示
+    DEC CX           ;CX-2 因为一列输出两个字
+    CMP CX,0
+    JNZ DZ_M         ;回到DZ_M 循环
+    POP DI
+    POP SI
+    POP DX
+    POP CX
+    POP BX
+    POP AX
+    RET    
+;显示点阵 向左    
+DZ_MAIN1:
+    PUSH AX
+    PUSH BX
+    PUSH CX
+    PUSH DX
+    PUSH SI
+    PUSH DI      
+    MOV BX,1H
+    MOV CX,40H                  
+DZ_N:                           
+    MOV AL,0FFH             
+    MOV DX, DZA_2        
+    OUT DX, AL  
+    MOV AL,0FFH
+    MOV DX, DZB_2
+    OUT DX, AL 
+    MOV AL,0FFH             
+    MOV DX, DZA_4        
+    OUT DX, AL  
+    MOV AL,0FFH
+    MOV DX, DZB_4
+    OUT DX, AL              
+    MOV AX,[SI]                 
+    MOV DX,DZA_1                 
+    OUT DX,AL  
+    MOV AL,AH                   
+    MOV DX,DZB_1            
+    OUT DX,AL    
+    MOV AX,[DI]               
+    MOV DX,DZA_3                 
+    OUT DX,AL  
+    MOV AL,AH                 
+    MOV DX,DZB_3            
+    OUT DX,AL           
+    CMP CX, 20H
+    JBE DZ_N1
+    MOV AX, BX 
+    NOT AX                    
+    MOV DX,DZA_2
+    OUT DX,AL   
+    MOV AL,AH                   
+    MOV DX,DZB_2
+    OUT DX,AL     
+    MOV AL,0FFH                   
+    MOV DX,DZA_4
+    OUT DX,AL
+    MOV DX,DZB_4
+    OUT DX,AL 
+    JMP DZ_N2     
+DZ_N1:    
+    MOV AX, BX
+    NOT AX   
+    MOV DX,DZA_4
+    OUT DX,AL
+    MOV AL,AH                   ;行高字节
+    MOV DX,DZB_4
+    OUT DX,AL  
+    MOV AL,0FFH                   
+    MOV DX,DZA_2
+    OUT DX,AL
+    MOV DX,DZB_2
+    OUT DX,AL
+DZ_N2:        
+    CALL DELAY_DZ         
+    INC SI      
+    INC SI
+    INC DI
+    INC DI  
+    CMP SI, OFFSET (WO+64)
+    JNZ DZ_N3
+    MOV SI,OFFSET(WO)                   
+    MOV DI,OFFSET(X_1)
+DZ_N3:
+    ROL BX,1H 
+    DEC CX
+    DEC CX
+    CMP CX,0
+    JNZ DZ_N
+    
+    POP DI
+    POP SI
+    POP DX
+    POP CX
+    POP BX
+    POP AX
+    RET    
+;延时函数 
+DELAY_SHORT:
+    PUSH CX
+    MOV CX, 0D7FFH      
+DELAY_LOOP:
+    NOP               
+    NOP
+    NOP
+    LOOP DELAY_LOOP
+    POP CX
+    RET
+DELAY:
+    PUSH CX
+DELAY_LOOP2:
+    CALL DELAY_SHORT
+    LOOP DELAY_LOOP2
+    POP CX
+    RET
+;点阵延时
+DELAY_DZ:              
+    PUSH CX
+    MOV CX,081H            
+DELAY1_DZ:       
+    LOOP DELAY1_DZ     
+    POP CX
+    RET    
+CODE  ENDS
+    END  START
